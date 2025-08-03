@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Catalog Agent UI</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 30px auto; padding: 10px; }
+    textarea, button { width: 100%; padding: 10px; margin-top: 10px; }
+    pre { background: #f0f0f0; padding: 10px; height: 200px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h2>📚 Cataloging Agent</h2>
+  <textarea id="query" placeholder="Search topic, e.g., AI books 2025"></textarea>
+  <button onclick="run()">Start Cataloging</button>
+  <pre id="log">Ready.</pre>
+
+  <script>
+    async function run() {
+      const query = document.getElementById("query").value;
+      const log = document.getElementById("log");
+      log.textContent += "\n🔍 Sending: " + query;
+      const res = await fetch("/catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+      const text = await res.text();
+      log.textContent += "\n✅ Done. Result:\n" + text;
+
+      const blob = new Blob([text], { type: "text/marc" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "catalog.mrc";
+      a.click();
+    }
+  </script>
+</body>
+</html>
